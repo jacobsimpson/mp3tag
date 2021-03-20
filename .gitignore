@@ -1,2 +1,10 @@
+# Build files.
+/mp3tag
+
+# Local directory with mp3 files that I use for testing. Should never be
+# checked in.
+/data/
+
+# Editor temp files.
 .sw?
 .*.sw?
