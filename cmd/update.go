@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/jacobsimpson/mp3tag/metadata"
 	id3 "github.com/mikkyang/id3-go"
 	"github.com/spf13/cobra"
 )
@@ -91,7 +92,7 @@ func updateFile(filename string) {
 }
 
 func renameFile(src string) error {
-	tags, err := readTags(src)
+	tags, err := metadata.ReadTags(src)
 	if err != nil {
 		return err
 	}
@@ -112,7 +113,7 @@ const (
 	variable
 )
 
-func expandRenameFormat(renameFormat string, tags *Tags) (string, error) {
+func expandRenameFormat(renameFormat string, tags *metadata.Tags) (string, error) {
 	result := ""
 	name := ""
 	state := initial
@@ -130,9 +131,9 @@ func expandRenameFormat(renameFormat string, tags *Tags) (string, error) {
 		case variable:
 			switch r {
 			case '}':
-				v, err := tags.Value(name)
-				if err != nil {
-					return "", err
+				v, ok := tags.Value(name)
+				if !ok {
+					return "", fmt.Errorf("%q is not a valid tag name", name)
 				}
 				result += v
 				state = initial
@@ -142,44 +143,4 @@ func expandRenameFormat(renameFormat string, tags *Tags) (string, error) {
 		}
 	}
 	return result, nil
-}
-
-type Tags struct {
-	Album  string
-	Artist string
-	Title  string
-	Year   string
-	Genre  string
-}
-
-func (t *Tags) Value(name string) (string, error) {
-	switch name {
-	case "album":
-		return t.Album, nil
-	case "artist":
-		return t.Artist, nil
-	case "title":
-		return t.Title, nil
-	case "year":
-		return t.Year, nil
-	case "genre":
-		return t.Genre, nil
-	}
-	return "", fmt.Errorf("no such attribute %q", name)
-}
-
-func readTags(filename string) (*Tags, error) {
-	mp3File, err := id3.Open(filename)
-	if err != nil {
-		return nil, fmt.Errorf("unable to open file %q: %+v", filename, err)
-	}
-	defer mp3File.Close()
-
-	return &Tags{
-		Album:  mp3File.Album(),
-		Artist: mp3File.Artist(),
-		Title:  mp3File.Title(),
-		Year:   mp3File.Year(),
-		Genre:  mp3File.Genre(),
-	}, nil
 }
