@@ -8,7 +8,11 @@
 // and leave extra input dangling, unconsumed.
 program   = _ EOF {
     return nil, nil
-} / _ identifier:identifier "=" value:value {
+} / _ expression:expression _ EOF {
+    return expression, nil
+}
+
+expression = _ identifier:identifier "=" value:value _ {
     n, ok := metadata.AsName(identifier.(string))
     if !ok { return nil, fmt.Errorf("%q is not a valid identifier", identifier.(string)) }
     return &ast.Equal{n, value.(string)}, nil
