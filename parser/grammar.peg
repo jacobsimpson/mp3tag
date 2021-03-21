@@ -1,0 +1,41 @@
+{
+	package parser
+}
+
+// When defining pigeon rules, these are all equivalent: =, <-, ← (U+2190), ⟵ (U+27F5)
+
+// If a rule doesn't include EOF, it can match against the prefix of the input,
+// and leave extra input dangling, unconsumed.
+program   = _ EOF {
+    return nil, nil
+} / _ identifier:identifier "=" value:value {
+    //return &Redirection{
+    //    Target: target.(string),
+    //    Type:   TruncateAll,
+    //}, nil
+    n, ok := metadata.AsName(identifier.(string))
+    if !ok { return nil, fmt.Errorf("%q is not a valid identifier", identifier.(string)) }
+    return &ast.Equal{n, value.(string)}, nil
+}
+
+value <- [^ \n\t\r]+ {
+    return strings.TrimSpace(string(c.text)), nil
+}
+
+identifier <- _ [a-zA-Z][a-zA-Z0-9]* {
+    // Without this action, the representation of this data in the resulting
+    // AST would be in the form of array of array of bytes. This single line
+    // changes the result of matching this rule to a single string.
+    return strings.TrimSpace(string(c.text)), nil
+}
+
+// The whitespace rule is used to capture whitespace. Most grammars that I
+// build are not whitespace sensitive, so the results of matching this will
+// normally be discarded somehow. There doesn't seem to be a way to easily
+// discard whitespace in pigeon, so it has to be embedded and ignored in each
+// rule where it could legally occur.
+_ "whitespace" <- [ \n\t\r]*
+
+// An EOF character is anything that is not a character. Use this to ensure all
+// input is consumed by a rule, and it doesn't just match the prefix.
+EOF = !.

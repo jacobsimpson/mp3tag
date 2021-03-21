@@ -6,5 +6,7 @@ A command line utility for modifying mp3 files and setting IDv3 tags.
 
 ```
 go mod tidy
+go generate ./...
 go build .
+go test ./...
 ```

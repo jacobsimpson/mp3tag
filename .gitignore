@@ -1,5 +1,6 @@
 # Build files.
 /mp3tag
+parser/grammar.go
 
 # Local directory with mp3 files that I use for testing. Should never be
 # checked in.

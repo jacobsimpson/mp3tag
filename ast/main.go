@@ -1,4 +1,4 @@
-package parser
+package ast
 
 import (
 	"fmt"
@@ -19,9 +19,9 @@ func (e *Equal) String() string {
 	return fmt.Sprintf("%s=%q", e.LHS, e.RHS)
 }
 
-func Parse(query string) (Expression, error) {
-	return &Equal{
-		LHS: "title",
-		RHS: "A Thousand Years",
-	}, nil
-}
+//func Parse(query string) (Expression, error) {
+//	return &Equal{
+//		LHS: "title",
+//		RHS: "A Thousand Years",
+//	}, nil
+//}

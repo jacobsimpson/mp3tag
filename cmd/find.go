@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/jacobsimpson/mp3tag/ast"
 	"github.com/jacobsimpson/mp3tag/metadata"
 	"github.com/jacobsimpson/mp3tag/parser"
 	"github.com/spf13/cobra"
@@ -45,19 +46,19 @@ func findCmdRun(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	query, err := parser.Parse(args[0])
+	query, err := parser.Parse("", []byte(args[0]), parser.Debug(false))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to parse query: %+v\n", err)
 		return
 	}
 
-	if err := execute(query, args[1:]); err != nil {
+	if err := execute(query.(ast.Expression), args[1:]); err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to execute query: %+v\n", err)
 		return
 	}
 }
 
-func execute(query parser.Expression, files []string) error {
+func execute(query ast.Expression, files []string) error {
 	for _, file := range files {
 		tags, err := metadata.ReadTags(file)
 		if err != nil {
@@ -73,14 +74,14 @@ func execute(query parser.Expression, files []string) error {
 	return nil
 }
 
-func match(query parser.Expression, tags *metadata.Tags) (bool, error) {
+func match(query ast.Expression, tags *metadata.Tags) (bool, error) {
 	switch q := query.(type) {
-	case *parser.Equal:
+	case *ast.Equal:
 		return equal(q, tags)
 	}
 	return false, nil
 }
 
-func equal(e *parser.Equal, tags *metadata.Tags) (bool, error) {
+func equal(e *ast.Equal, tags *metadata.Tags) (bool, error) {
 	return tags.Value(e.LHS) == e.RHS, nil
 }
