@@ -9,6 +9,7 @@ import (
 )
 
 type showFlagsStruct struct {
+	all    bool
 	album  bool
 	artist bool
 	genre  bool
@@ -41,13 +42,13 @@ func showCmdRun(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	showFlags.all = !(showFlags.album || showFlags.artist || showFlags.genre || showFlags.title || showFlags.year)
 	for _, filename := range args {
 		showFile(filename)
 	}
 }
 
 func showFile(filename string) {
-	fmt.Printf("Working on %q\n", filename)
 	mp3File, err := id3.Open(filename)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to open %q: %+v\n", filename, err)
@@ -55,20 +56,21 @@ func showFile(filename string) {
 	}
 	defer mp3File.Close()
 
-	if showFlags.album {
-		fmt.Println(mp3File.Album())
+	fmt.Println("========")
+	if showFlags.album || showFlags.all {
+		fmt.Printf("Album:  %s\n", mp3File.Album())
 	}
-	if showFlags.artist {
-		fmt.Println(mp3File.Artist())
+	if showFlags.artist || showFlags.all {
+		fmt.Printf("Artist: %s\n", mp3File.Artist())
 	}
-	if showFlags.title {
-		fmt.Println(mp3File.Title())
+	if showFlags.title || showFlags.all {
+		fmt.Printf("Title:  %s\n", mp3File.Title())
 	}
-	if showFlags.year {
-		fmt.Println(mp3File.Year())
+	if showFlags.year || showFlags.all {
+		fmt.Printf("Year:   %s\n", mp3File.Year())
 	}
-	if showFlags.genre {
-		fmt.Println(mp3File.Genre())
+	if showFlags.genre || showFlags.all {
+		fmt.Printf("Genre:  %s\n", mp3File.Genre())
 	}
 
 }
