@@ -3,43 +3,44 @@ package cmd
 import (
 	"testing"
 
+	"github.com/jacobsimpson/mp3tag/metadata"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestExpandRenameFormat(t *testing.T) {
 	tests := []struct {
 		format string
-		tags   *Tags
+		tags   *metadata.Tags
 		want   string
 	}{
 		{
 			"{title}.mp3",
-			&Tags{Title: "this-is-the-title"},
+			&metadata.Tags{Title: "this-is-the-title"},
 			"this-is-the-title.mp3",
 		},
 		{
 			"293ab{title}-file.mp3",
-			&Tags{Title: "this-is-the-title"},
+			&metadata.Tags{Title: "this-is-the-title"},
 			"293abthis-is-the-title-file.mp3",
 		},
 		{
 			"{title}this{title}xy{title}.mp3",
-			&Tags{Title: "mytitle"},
+			&metadata.Tags{Title: "mytitle"},
 			"mytitlethismytitlexymytitle.mp3",
 		},
 		{
 			"{album}",
-			&Tags{Title: "mytitle"},
+			&metadata.Tags{Title: "mytitle"},
 			"",
 		},
 		{
 			"thisisafilename",
-			&Tags{Title: "mytitle"},
+			&metadata.Tags{Title: "mytitle"},
 			"thisisafilename",
 		},
 		{
 			"1{artist}2",
-			&Tags{Artist: "mytitle"},
+			&metadata.Tags{Artist: "mytitle"},
 			"1mytitle2",
 		},
 	}

@@ -131,11 +131,11 @@ func expandRenameFormat(renameFormat string, tags *metadata.Tags) (string, error
 		case variable:
 			switch r {
 			case '}':
-				v, ok := tags.Value(name)
+				n, ok := metadata.AsName(name)
 				if !ok {
 					return "", fmt.Errorf("%q is not a valid tag name", name)
 				}
-				result += v
+				result += tags.Value(n)
 				state = initial
 			default:
 				name += string(r)

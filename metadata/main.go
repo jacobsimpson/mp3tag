@@ -6,6 +6,32 @@ import (
 	id3 "github.com/mikkyang/id3-go"
 )
 
+type Name string
+
+const (
+	Album  Name = "album"
+	Artist      = "artist"
+	Title       = "title"
+	Year        = "year"
+	Genre       = "genre"
+)
+
+func AsName(name string) (Name, bool) {
+	switch name {
+	case "album":
+		return Album, true
+	case "artist":
+		return Artist, true
+	case "title":
+		return Title, true
+	case "year":
+		return Year, true
+	case "genre":
+		return Genre, true
+	}
+	return "", false
+}
+
 type Tags struct {
 	Album  string
 	Artist string
@@ -14,20 +40,22 @@ type Tags struct {
 	Genre  string
 }
 
-func (t *Tags) Value(name string) (string, bool) {
+func (t *Tags) Value(name Name) string {
 	switch name {
-	case "album":
-		return t.Album, true
-	case "artist":
-		return t.Artist, true
-	case "title":
-		return t.Title, true
-	case "year":
-		return t.Year, true
-	case "genre":
-		return t.Genre, true
+	case Album:
+		return t.Album
+	case Artist:
+		return t.Artist
+	case Title:
+		return t.Title
+	case Year:
+		return t.Year
+	case Genre:
+		return t.Genre
 	}
-	return "", false
+	// As long as this switch statement above is exhaustive, (which it is
+	// supposed to be), this return statement will never be reached.
+	return t.Genre
 }
 
 func ReadTags(filename string) (*Tags, error) {
