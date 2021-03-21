@@ -19,9 +19,11 @@ func (e *Equal) String() string {
 	return fmt.Sprintf("%s=%q", e.LHS, e.RHS)
 }
 
-//func Parse(query string) (Expression, error) {
-//	return &Equal{
-//		LHS: "title",
-//		RHS: "A Thousand Years",
-//	}, nil
-//}
+type Has struct {
+	LHS metadata.Name
+	RHS string
+}
+
+func (h *Has) String() string {
+	return fmt.Sprintf("%s:%q", h.LHS, h.RHS)
+}

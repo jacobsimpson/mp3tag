@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/jacobsimpson/mp3tag/ast"
 	"github.com/jacobsimpson/mp3tag/metadata"
@@ -78,10 +79,16 @@ func match(query ast.Expression, tags *metadata.Tags) (bool, error) {
 	switch q := query.(type) {
 	case *ast.Equal:
 		return equal(q, tags)
+	case *ast.Has:
+		return has(q, tags)
 	}
 	return false, nil
 }
 
 func equal(e *ast.Equal, tags *metadata.Tags) (bool, error) {
-	return tags.Value(e.LHS) == e.RHS, nil
+	return strings.ToLower(tags.Value(e.LHS)) == strings.ToLower(e.RHS), nil
+}
+
+func has(e *ast.Has, tags *metadata.Tags) (bool, error) {
+	return strings.Contains(strings.ToLower(tags.Value(e.LHS)), strings.ToLower(e.RHS)), nil
 }

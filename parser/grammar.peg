@@ -12,7 +12,17 @@ program   = _ EOF {
     return expression, nil
 }
 
-expression = _ identifier:identifier "=" value:value _ {
+expression = e:(equal / has) {
+    return e, nil
+}
+
+has = _ identifier:identifier ":" value:value _ {
+    n, ok := metadata.AsName(identifier.(string))
+    if !ok { return nil, fmt.Errorf("%q is not a valid identifier", identifier.(string)) }
+    return &ast.Has{n, value.(string)}, nil
+}
+
+equal = _ identifier:identifier "=" value:value _ {
     n, ok := metadata.AsName(identifier.(string))
     if !ok { return nil, fmt.Errorf("%q is not a valid identifier", identifier.(string)) }
     return &ast.Equal{n, value.(string)}, nil
