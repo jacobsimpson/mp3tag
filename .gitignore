@@ -4,6 +4,8 @@
 # Local directory with mp3 files that I use for testing. Should never be
 # checked in.
 /data/
+# Other test data.
+*.mp3
 
 # Editor temp files.
 .sw?
