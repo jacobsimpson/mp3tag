@@ -64,7 +64,7 @@ func tagUpdates() bool {
 
 func updateFile(filename string) {
 
-	fmt.Printf("Working on %q\n", filename)
+	fmt.Printf("Updating %q\n", filename)
 	mp3File, err := id3.Open(filename)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to open %q: %+v\n", filename, err)
