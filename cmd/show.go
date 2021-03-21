@@ -8,18 +8,22 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var album bool
-var artist bool
-var genre bool
-var title bool
-var year bool
+type showFlagsStruct struct {
+	album  bool
+	artist bool
+	genre  bool
+	title  bool
+	year   bool
+}
+
+var showFlags showFlagsStruct
 
 func init() {
-	showCmd.Flags().BoolVarP(&album, "album", "b", false, "")
-	showCmd.Flags().BoolVarP(&artist, "artist", "a", false, "")
-	showCmd.Flags().BoolVarP(&genre, "genre", "g", false, "")
-	showCmd.Flags().BoolVarP(&title, "title", "t", false, "")
-	showCmd.Flags().BoolVarP(&year, "year", "y", false, "")
+	showCmd.Flags().BoolVarP(&showFlags.album, "album", "b", false, "")
+	showCmd.Flags().BoolVarP(&showFlags.artist, "artist", "a", false, "")
+	showCmd.Flags().BoolVarP(&showFlags.genre, "genre", "g", false, "")
+	showCmd.Flags().BoolVarP(&showFlags.title, "title", "t", false, "")
+	showCmd.Flags().BoolVarP(&showFlags.year, "year", "y", false, "")
 	rootCmd.AddCommand(showCmd)
 }
 
@@ -38,30 +42,33 @@ func showCmdRun(cmd *cobra.Command, args []string) {
 	}
 
 	for _, filename := range args {
-
-		fmt.Printf("Working on %q\n", filename)
-		mp3File, err := id3.Open(filename)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Unable to open %q: %+v\n", filename, err)
-			os.Exit(1)
-		}
-		defer mp3File.Close()
-
-		if album {
-			fmt.Println(mp3File.Album())
-		}
-		if artist {
-			fmt.Println(mp3File.Artist())
-		}
-		if title {
-			fmt.Println(mp3File.Title())
-		}
-		if year {
-			fmt.Println(mp3File.Year())
-		}
-		if genre {
-			fmt.Println(mp3File.Genre())
-		}
-
+		showFile(filename)
 	}
+}
+
+func showFile(filename string) {
+	fmt.Printf("Working on %q\n", filename)
+	mp3File, err := id3.Open(filename)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to open %q: %+v\n", filename, err)
+		os.Exit(1)
+	}
+	defer mp3File.Close()
+
+	if showFlags.album {
+		fmt.Println(mp3File.Album())
+	}
+	if showFlags.artist {
+		fmt.Println(mp3File.Artist())
+	}
+	if showFlags.title {
+		fmt.Println(mp3File.Title())
+	}
+	if showFlags.year {
+		fmt.Println(mp3File.Year())
+	}
+	if showFlags.genre {
+		fmt.Println(mp3File.Genre())
+	}
+
 }
