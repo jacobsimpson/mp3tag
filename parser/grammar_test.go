@@ -22,6 +22,10 @@ func TestParse(t *testing.T) {
 			"    artist=thisistheartist    ",
 			&ast.Equal{metadata.Artist, "thisistheartist"},
 		},
+		{
+			`    artist="this is the artist"    `,
+			&ast.Equal{metadata.Artist, "this is the artist"},
+		},
 	}
 
 	for _, test := range tests {

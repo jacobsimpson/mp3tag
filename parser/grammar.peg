@@ -18,8 +18,25 @@ program   = _ EOF {
     return &ast.Equal{n, value.(string)}, nil
 }
 
-value <- [^ \n\t\r]+ {
+value = value:(double_quoted_string / single_quoted_string / word) {
+    return value, nil
+}
+
+word = [^ \n\t\r>&|]+ {
+    // Without this action, the representation of this data in the resulting
+    // AST would be in the form of array of array of bytes. This single line
+    // changes the result of matching this rule to a single string.
     return strings.TrimSpace(string(c.text)), nil
+}
+
+double_quoted_string = '"' [^"]* '"' {
+    s := string(c.text)
+    return s[1:len(s)-1], nil
+}
+
+single_quoted_string = "'" [^']* "'" {
+    s := string(c.text)
+    return s[1:len(s)-1], nil
 }
 
 identifier <- _ [a-zA-Z][a-zA-Z0-9]* {
