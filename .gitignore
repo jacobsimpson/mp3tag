@@ -8,6 +8,8 @@ parser/grammar.go
 # Other test data.
 *.mp3
 
+TODO.md
+
 # Editor temp files.
 .sw?
 .*.sw?
