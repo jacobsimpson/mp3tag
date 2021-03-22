@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/jacobsimpson/mp3tag/metadata"
 	id3 "github.com/mikkyang/id3-go"
@@ -21,29 +23,56 @@ type updateFlagsStruct struct {
 var updateFlags updateFlagsStruct
 
 func init() {
-	updateCmd.Flags().StringVarP(&updateFlags.album, "album", "b", "", "")
-	updateCmd.Flags().StringVarP(&updateFlags.artist, "artist", "a", "", "")
-	updateCmd.Flags().StringVarP(&updateFlags.genre, "genre", "g", "", "")
-	updateCmd.Flags().StringVarP(&updateFlags.title, "title", "t", "", "")
-	updateCmd.Flags().StringVarP(&updateFlags.year, "year", "y", "", "")
-	updateCmd.Flags().StringVarP(&updateFlags.renameFormat, "rename", "r", "", "")
+	updateCmd.Flags().StringVarP(&updateFlags.album, "album", "b", "", "specify a new value for the album tag")
+	updateCmd.Flags().StringVarP(&updateFlags.artist, "artist", "a", "", "specify a new value for the artist tag")
+	updateCmd.Flags().StringVarP(&updateFlags.genre, "genre", "g", "", "specify a new value for the genre tag")
+	updateCmd.Flags().StringVarP(&updateFlags.title, "title", "t", "", "specify a new value for the title tag")
+	updateCmd.Flags().StringVarP(&updateFlags.year, "year", "y", "", "specify a new value for the year tag")
+	updateCmd.Flags().StringVarP(&updateFlags.renameFormat, "rename", "r", "", "rename the file using tag values")
 	rootCmd.AddCommand(updateCmd)
 }
 
 var updateCmd = &cobra.Command{
-	Use:   "update",
+	Use:   "update [flags] file+",
 	Short: "Update the requested attributes of the specified files.",
-	Long:  "Update the requested attributes of the specified files.",
-	Args:  cobra.MinimumNArgs(1),
-	Run:   updateCmdRun,
+	Long: strings.TrimSpace(`
+Update the requested attributes of the specified files. The values specified
+will be set on all files specified. This behavior is a natural fit for
+attributes like album, artist, or genre where many files may share the same
+values. It is probably less interesting to set the same title on the entire
+list of files.`),
+	Example: `  Set 'John Doe' as the artist for all mp3 files:
+  	update --artist="John Doe" *.mp3
+
+  Set the artist to 'John Doe', the album to 'The Best Podcast', and the genre to
+  'Podcast' for all mp3 files in the podcast directory:
+  	update --artist="John Doe" --album="The Best Podcast" --genre=Podcast podcast/*.mp3
+
+  Rename all .mp3 files in the podcast directory to '<artist> - <album> -
+  <title>.mp3'. The actual name of the file will depend on the values each of
+  those tags has for each file:
+  	update --rename="{artist} - {album} - {title}.mp3" podcast/*.mp3`,
+	Args: func(cmd *cobra.Command, args []string) error {
+		any := updateFlags.album != "" ||
+			updateFlags.artist != "" ||
+			updateFlags.title != "" ||
+			updateFlags.year != "" ||
+			updateFlags.genre != "" ||
+			updateFlags.renameFormat != ""
+		if !any {
+			return errors.New("requires at least one flag to update")
+		}
+
+		if len(args) < 1 {
+			return errors.New("requires at least one file")
+		}
+
+		return nil
+	},
+	Run: updateCmdRun,
 }
 
 func updateCmdRun(cmd *cobra.Command, args []string) {
-	if len(args) == 0 {
-		fmt.Println("No files specified.")
-		return
-	}
-
 	for _, filename := range args {
 		if tagUpdates() {
 			updateFile(filename)

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -18,36 +19,28 @@ type findFlagsStruct struct {
 var findFlags findFlagsStruct
 
 func init() {
-	//updateCmd.Flags().StringVarP(&updateFlags.album, "album", "b", "", "")
-	//updateCmd.Flags().StringVarP(&updateFlags.artist, "artist", "a", "", "")
-	//updateCmd.Flags().StringVarP(&updateFlags.genre, "genre", "g", "", "")
-	//updateCmd.Flags().StringVarP(&updateFlags.title, "title", "t", "", "")
-	//updateCmd.Flags().StringVarP(&updateFlags.year, "year", "y", "", "")
-	//updateCmd.Flags().StringVarP(&updateFlags.renameFormat, "rename", "r", "", "")
 	rootCmd.AddCommand(findCmd)
 }
 
 var findCmd = &cobra.Command{
-	Use:   "find",
-	Short: "Find files that match the query.",
-	Long: `Find files that match the query.
+	Use:   "find [flags] filter file+",
+	Short: "Filter the list of files to those that match the filter.",
+	Long:  `Filter the list of files to those that match the filter.`,
+	Example: `  List the .mp3 files where the title property is blank:
+  	find 'title=""' *.mp3
 
-	Queries take the form of:
-
-	title="abc"
-
-	title=""
-	`,
-	Args: cobra.MinimumNArgs(2),
-	Run:  findCmdRun,
+  List all the .mp3 files where the artist contains the string 'mike':
+  	find 'artist:mike' *.mp3`,
+	Args: func(cmd *cobra.Command, args []string) error {
+		if len(args) < 2 {
+			return errors.New("requires a filter and at least one file")
+		}
+		return nil
+	},
+	Run: findCmdRun,
 }
 
 func findCmdRun(cmd *cobra.Command, args []string) {
-	if len(args) < 2 {
-		fmt.Println("No files specified.")
-		return
-	}
-
 	query, err := parser.Parse("", []byte(args[0]), parser.Debug(false))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to parse query: %+v\n", err)
