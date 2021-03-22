@@ -52,7 +52,6 @@ func updateCmdRun(cmd *cobra.Command, args []string) {
 			renameFile(filename)
 		}
 	}
-
 }
 
 func tagUpdates() bool {
