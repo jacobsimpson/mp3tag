@@ -16,6 +16,6 @@ var versionCmd = &cobra.Command{
 	Long:  "Print the version number of mp3tag",
 	Args:  cobra.MaximumNArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("mp3tag v0.1 -- HEAD")
+		fmt.Println("mp3tag v0.1.1 -- HEAD")
 	},
 }

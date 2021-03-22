@@ -51,3 +51,8 @@ go generate ./...
 go build .
 go test ./...
 ```
+
+## Release
+
+1.   Update the version number.
+1.   Run all commands in development.
