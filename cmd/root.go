@@ -26,6 +26,8 @@ as file renaming. For example:
 	Run: func(cmd *cobra.Command, args []string) {
 		if version {
 			printVersion()
+		} else {
+			cmd.Help()
 		}
 	},
 }
